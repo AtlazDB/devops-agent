@@ -1,4 +1,5 @@
 package br.com.fatec.devopsagent.service;
+
 import br.com.fatec.devopsagent.config.GitHubConfig;
 import br.com.fatec.devopsagent.entity.WorkflowRunsResponse;
 import org.jspecify.annotations.Nullable;
@@ -33,5 +34,20 @@ public class GitHubService {
                 .uri(url)
                 .retrieve()
                 .body(WorkflowRunsResponse.class);
+    }
+
+    public String getJobLogs(String jobId) {
+
+        String url = String.format(
+                "/repos/%s/%s/actions/jobs/%d/logs",
+                config.organization(),
+                config.repository(),
+                jobId
+        );
+
+        return restClient.get()
+                .uri(url)
+                .retrieve()
+                .body(String.class);
     }
 }

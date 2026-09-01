@@ -1,4 +1,4 @@
-package br.com.fatec.devopsagent.entity;
+package br.com.fatec.devopsagent.dto;
 
 import java.util.List;
 

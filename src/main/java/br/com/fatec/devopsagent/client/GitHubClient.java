@@ -1,18 +1,18 @@
-package br.com.fatec.devopsagent.service;
+package br.com.fatec.devopsagent.client;
 
 import br.com.fatec.devopsagent.config.GitHubConfig;
-import br.com.fatec.devopsagent.entity.WorkflowRunsResponse;
+import br.com.fatec.devopsagent.dto.WorkflowRunsResponse;
 import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-@Service
-public class GitHubService {
+@Component
+public class GitHubClient {
 
     private final RestClient restClient;
     private final GitHubConfig config;
 
-    public GitHubService(GitHubConfig config) {
+    public GitHubClient(GitHubConfig config) {
         this.config = config;
 
         this.restClient = RestClient.builder()
@@ -39,7 +39,7 @@ public class GitHubService {
     public String getJobLogs(String jobId) {
 
         String url = String.format(
-                "/repos/%s/%s/actions/jobs/%d/logs",
+                "/repos/%s/%s/actions/jobs/%s/logs",
                 config.organization(),
                 config.repository(),
                 jobId

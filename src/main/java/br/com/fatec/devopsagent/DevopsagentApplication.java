@@ -28,7 +28,7 @@ public class DevopsagentApplication {
 
             for (WorkflowRun run : response.workflow_runs()) {
                 System.out.println(run.id());
-                System.out.println(run.display_title());
+                System.out.println(run.name());
                 System.out.println(run.status());
                 System.out.println(run.conclusion());
             }

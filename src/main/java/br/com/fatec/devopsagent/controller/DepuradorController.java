@@ -1,6 +1,6 @@
 package br.com.fatec.devopsagent.controller;
 
-import br.com.fatec.devopsagent.client.JanClient;
+import br.com.fatec.devopsagent.service.JanClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;

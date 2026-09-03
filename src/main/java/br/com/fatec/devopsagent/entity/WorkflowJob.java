@@ -1,9 +1,8 @@
-package br.com.fatec.devopsagent.dto;
+package br.com.fatec.devopsagent.entity;
 
-public record WorkflowRun(
+public record WorkflowJob(
         Long id,
         String name,
         String status,
         String conclusion
-) {
-}
+) {}

@@ -1,4 +1,4 @@
-package br.com.fatec.devopsagent.client;
+package br.com.fatec.devopsagent.service;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Component;

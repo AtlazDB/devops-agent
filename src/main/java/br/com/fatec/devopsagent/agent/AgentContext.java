@@ -1,5 +1,7 @@
 package br.com.fatec.devopsagent.agent;
 
+import br.com.fatec.devopsagent.agent.observer.AgentEvent;
+import br.com.fatec.devopsagent.agent.observer.AgentEventPublisher;
 import br.com.fatec.devopsagent.agent.strategy.PlanningStrategy;
 
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ public class AgentContext {
     private final PlanningStrategy strategy;
     private final CommandExecutor executor;
     private final int maxIterations;
+    private final AgentEventPublisher events;          // NOVO (Observer)
 
     private final List<Observation> observations = new ArrayList<>();
 
@@ -23,15 +26,27 @@ public class AgentContext {
     public AgentContext(Long runId,
                         PlanningStrategy strategy,
                         CommandExecutor executor,
-                        int maxIterations) {
+                        int maxIterations,
+                        AgentEventPublisher events) {
         this.runId = runId;
         this.strategy = strategy;
         this.executor = executor;
         this.maxIterations = maxIterations;
+        this.events = events;
     }
 
+    // construtor antigo mantido para nao quebrar testes existentes: publica para ninguem
+    public AgentContext(Long runId,
+                        PlanningStrategy strategy,
+                        CommandExecutor executor,
+                        int maxIterations) {
+        this(runId, strategy, executor, maxIterations, new AgentEventPublisher(List.of()));
+    }
+
+    // Toda Observation passa por aqui -> unico ponto para avisar os observers que um Command terminou
     public void record(Observation observation) {
         observations.add(observation);
+        events.publish(AgentEvent.stepExecuted(runId, observation));
     }
 
     public Optional<Observation> lastObservation() {

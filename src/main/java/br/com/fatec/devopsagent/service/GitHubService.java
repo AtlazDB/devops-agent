@@ -2,14 +2,14 @@ package br.com.fatec.devopsagent.service;
 
 import br.com.fatec.devopsagent.config.GitHubConfig;
 import br.com.fatec.devopsagent.entity.WorkflowJobsResponse;
+import br.com.fatec.devopsagent.entity.WorkflowRun;
 import br.com.fatec.devopsagent.entity.WorkflowRunsResponse;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.server.ResponseStatusException;
-
-import br.com.fatec.devopsagent.entity.WorkflowRun;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ public class GitHubService {
                 .body(WorkflowRunsResponse.class);
     }
 
-        public String getJobLogs(String jobId) {
+    public String getJobLogs(String jobId) {
 
         String url = String.format(
                 "/repos/%s/%s/actions/jobs/%s/logs",
@@ -52,13 +52,26 @@ public class GitHubService {
                 jobId
         );
 
-        return restClient.get()
+        // O GitHub responde 302 com o link temporario do arquivo de log (campo Location).
+        ResponseEntity<String> response = restClient.get()
                 .uri(url)
                 .retrieve()
-                .body(String.class);
+                .toEntity(String.class);
+
+        if (response.getStatusCode().is3xxRedirection() && response.getHeaders().getLocation() != null) {
+            // Segue o link SEM o token: o link ja traz a propria autorizacao,
+            // e o token do GitHub nao deve ser enviado para outro servidor.
+            return RestClient.create()
+                    .get()
+                    .uri(response.getHeaders().getLocation())
+                    .retrieve()
+                    .body(String.class);
+        }
+        return response.getBody();
     }
 
-        public WorkflowRun getWorkflowRunById(Long runId) {
+    public WorkflowRun getWorkflowRunById(Long runId) {
+
         String url = String.format(
                 "/repos/%s/%s/actions/runs/%d",
                 config.organization(),
@@ -72,12 +85,12 @@ public class GitHubService {
                 .body(WorkflowRun.class);
 
         if (run == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Workflow run not found: " + runId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Workflow run not found: " + runId);
         }
         return run;
-        }
+    }
 
-        public WorkflowJobsResponse getWorkflowJobs(Long runId) {
+    public WorkflowJobsResponse getWorkflowJobs(Long runId) {
 
         String url = String.format(
                 "/repos/%s/%s/actions/runs/%d/jobs",
@@ -90,18 +103,17 @@ public class GitHubService {
                 .uri(url)
                 .retrieve()
                 .body(WorkflowJobsResponse.class);
-        }
+    }
 
-        public List<Long> getWorkflowRunIds() {
+    public List<Long> getWorkflowRunIds() {
 
         WorkflowRunsResponse response = getWorkflowRuns();
         if (response == null) {
-                return List.of();
+            return List.of();
         }
         return response.workflow_runs()
                 .stream()
                 .map(WorkflowRun::id)
                 .toList();
-        }
-
+    }
 }

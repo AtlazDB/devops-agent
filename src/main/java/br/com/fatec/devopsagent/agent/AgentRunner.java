@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 @Service
 public class AgentRunner {
 
@@ -75,5 +78,9 @@ public class AgentRunner {
             events.publish(AgentEvent.finished(runId, context.getAnswer()));
         }
         return context;
+    }
+    // usado pela GUI (Parte 3) para preencher o combo de estratégias
+    public Set<String> availableStrategies() {
+        return new TreeSet<>(strategies.keySet());
     }
 }

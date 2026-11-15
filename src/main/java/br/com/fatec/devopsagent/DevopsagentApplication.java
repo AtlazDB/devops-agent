@@ -6,6 +6,7 @@ import br.com.fatec.devopsagent.entity.WorkflowRunsResponse;
 import br.com.fatec.devopsagent.service.GitHubService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.boot.CommandLineRunner;
@@ -18,7 +19,9 @@ import java.util.List;
 public class DevopsagentApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DevopsagentApplication.class, args);
+        new SpringApplicationBuilder(DevopsagentApplication.class)
+        .headless(false)
+        .run(args);
     }
 
     @Bean
